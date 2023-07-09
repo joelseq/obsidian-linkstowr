@@ -1,36 +1,44 @@
-import axios from 'axios';
 import {
   App,
   Editor,
   MarkdownView,
   Modal,
+  normalizePath,
   Plugin,
   PluginSettingTab,
   Setting,
-  TFile,
 } from 'obsidian';
+import {Clip} from './types';
+import {getAPI} from './utils/api';
+import {replaceIllegalFileNameCharactersInString} from './utils/file';
+import {
+  applyTemplateTransformations,
+  executeInlineScriptsTemplates,
+  getTemplateContents,
+  replaceVariableSyntax,
+  useTemplaterPluginInFile,
+} from './utils/template';
 
 // Remember to rename these classes and interfaces!
 
 interface PluginSettings {
-  clipsFilePath: string;
+  accessToken: string;
+  clipsFolderPath: string;
+  templateFilePath: string;
 }
 
-type Clip = {
-  url: string;
-  note: string | undefined;
-};
-
 const DEFAULT_SETTINGS: PluginSettings = {
-  clipsFilePath: 'clips.md',
+  accessToken: '',
+  clipsFolderPath: 'clips',
+  templateFilePath: '',
 };
 
-const INITIAL_TEXT = `
-# OmniClipper Clips
-
-| Link | Notes |
-| ---- | ----- |
-`;
+// const INITIAL_TEXT = `
+// # OmniClipper Clips
+//
+// | Link | Notes |
+// | ---- | ----- |
+// `;
 
 export default class OmniClipperPlugin extends Plugin {
   settings: PluginSettings;
@@ -42,7 +50,7 @@ export default class OmniClipperPlugin extends Plugin {
     const ribbonIconEl = this.addRibbonIcon(
       'dice',
       'OmniClipper Sync',
-      (evt: MouseEvent) => {
+      (_evt: MouseEvent) => {
         // Called when the user clicks the icon.
         // new Notice('This is a notice!');
         this.sync();
@@ -67,7 +75,7 @@ export default class OmniClipperPlugin extends Plugin {
     this.addCommand({
       id: 'sample-editor-command',
       name: 'Sample editor command',
-      editorCallback: (editor: Editor, view: MarkdownView) => {
+      editorCallback: (editor: Editor, _view: MarkdownView) => {
         console.log(editor.getSelection());
         editor.replaceSelection('Sample Editor Command');
       },
@@ -119,34 +127,51 @@ export default class OmniClipperPlugin extends Plugin {
   }
 
   async sync() {
-    const response = await axios.get(`${process.env.API_URL}/api/clips`);
+    const api = getAPI(this.settings.accessToken);
+    const response = await api.get('/api/clips');
 
     console.log('[OmniClipper] Got response: ', response);
-    const links: Array<Clip> | undefined = response.data?.links;
+    const clips: Array<Clip> | undefined = response.data;
 
-    if (links) {
-      console.log('Got links', links);
-      const file = (await this.getClipsFile()) as TFile;
-      console.log('Got file', file);
+    if (clips) {
+      console.log('Got clips', clips);
+      const createdClipsPromises = clips.map(async (clip) => {
+        const renderedContent = await this.getRenderedContent(clip);
 
-      const textToAppend = links.map(({url, note}) => {
-        console.log('Appending url and note', url, note);
-        return `|${url}|${note}|`;
+        const fileName = replaceIllegalFileNameCharactersInString(clip.title);
+        const filePath = `${normalizePath(
+          this.settings.clipsFolderPath,
+        )}/${fileName}.md`;
+        try {
+          const targetFile = await this.app.vault.create(
+            filePath,
+            renderedContent,
+          );
+
+          console.log('Target file:', targetFile);
+
+          await useTemplaterPluginInFile(this.app, targetFile);
+        } catch (err) {
+          console.error(`Failed to create file: ${fileName}`, err);
+        }
       });
 
-      await this.app.vault.append(file, '\n' + textToAppend.join('\n'));
+      await Promise.all(createdClipsPromises);
 
-      await axios.post(`${process.env.API_URL}/api/clips/clear`);
+      await api.post('/api/clips/clear');
     }
   }
 
-  async getClipsFile() {
-    const vault = this.app.vault;
-    let file = vault.getAbstractFileByPath(this.settings.clipsFilePath);
-    if (!file) {
-      file = await vault.create(this.settings.clipsFilePath, INITIAL_TEXT);
-    }
-    return file;
+  async getRenderedContent(clip: Clip) {
+    const templateContents = await getTemplateContents(
+      this.app,
+      this.settings.templateFilePath,
+    );
+    const replacedVariable = replaceVariableSyntax(
+      clip,
+      applyTemplateTransformations(templateContents),
+    );
+    return executeInlineScriptsTemplates(clip, replacedVariable);
   }
 }
 
@@ -182,15 +207,42 @@ class OmniClipperSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', {text: 'Settings for OmniClipper'});
 
     new Setting(containerEl)
-      .setName('Clips File Path')
-      .setDesc('Path to the file to save the clips to')
+      .setName('Clips Folder Path')
+      .setDesc('Path to the folder to save the clips to')
       .addText((text) =>
         text
-          .setPlaceholder('Enter the path to the file to save your clips to')
-          .setValue(this.plugin.settings.clipsFilePath)
+          .setPlaceholder(
+            'Enter the path to the folder to save your clips to (relative to your vault)',
+          )
+          .setValue(this.plugin.settings.clipsFolderPath)
           .onChange(async (value) => {
-            console.log('Clips File Path: ' + value);
-            this.plugin.settings.clipsFilePath = value;
+            console.log('Clips Folder Path: ' + value);
+            this.plugin.settings.clipsFolderPath = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('Access Token')
+      .setDesc('Enter your Access Token')
+      .addText((text) =>
+        text
+          .setPlaceholder('oclip_XXXXXX_XXXXXXXXXXX')
+          .setValue(this.plugin.settings.accessToken)
+          .onChange(async (value) => {
+            this.plugin.settings.accessToken = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('Template File Path')
+      .setDesc('Enter path to template file')
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.templateFilePath)
+          .onChange(async (value) => {
+            this.plugin.settings.templateFilePath = value;
             await this.plugin.saveSettings();
           }),
       );
