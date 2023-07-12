@@ -34,7 +34,7 @@ export async function getTemplateContents(
     return templateFile ? vault.cachedRead(templateFile) : DEFAULT_TEMPLATE;
   } catch (err) {
     console.error(`Failed to read template path: ${templatePath}`, err);
-    new Notice('Failed to read template file OmniClipper');
+    new Notice('Failed to read template file LinkShelf');
     return DEFAULT_TEMPLATE;
   }
 }

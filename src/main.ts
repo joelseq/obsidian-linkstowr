@@ -1,13 +1,4 @@
-import {
-  App,
-  Editor,
-  MarkdownView,
-  Modal,
-  normalizePath,
-  Plugin,
-  PluginSettingTab,
-  Setting,
-} from 'obsidian';
+import {App, normalizePath, Plugin, PluginSettingTab, Setting} from 'obsidian';
 import {Clip} from './types';
 import {getAPI} from './utils/api';
 import {replaceIllegalFileNameCharactersInString} from './utils/file';
@@ -34,13 +25,13 @@ const DEFAULT_SETTINGS: PluginSettings = {
 };
 
 // const INITIAL_TEXT = `
-// # OmniClipper Clips
+// # LinkShelf Clips
 //
 // | Link | Notes |
 // | ---- | ----- |
 // `;
 
-export default class OmniClipperPlugin extends Plugin {
+export default class LinkShelfPlugin extends Plugin {
   settings: PluginSettings;
 
   async onload() {
@@ -49,7 +40,7 @@ export default class OmniClipperPlugin extends Plugin {
     // This creates an icon in the left ribbon.
     const ribbonIconEl = this.addRibbonIcon(
       'dice',
-      'OmniClipper Sync',
+      'LinkShelf Sync',
       (_evt: MouseEvent) => {
         // Called when the user clicks the icon.
         // new Notice('This is a notice!');
@@ -65,44 +56,15 @@ export default class OmniClipperPlugin extends Plugin {
 
     // This adds a simple command that can be triggered anywhere
     this.addCommand({
-      id: 'sync-clips',
-      name: 'Sync clips (OmniClipper)',
+      id: 'linkshelf-sync-links',
+      name: 'Sync links (Link Shelf)',
       callback: async () => {
         await this.sync();
       },
     });
-    // This adds an editor command that can perform some operation on the current editor instance
-    this.addCommand({
-      id: 'sample-editor-command',
-      name: 'Sample editor command',
-      editorCallback: (editor: Editor, _view: MarkdownView) => {
-        console.log(editor.getSelection());
-        editor.replaceSelection('Sample Editor Command');
-      },
-    });
-    // This adds a complex command that can check whether the current state of the app allows execution of the command
-    this.addCommand({
-      id: 'open-sample-modal-complex',
-      name: 'Open sample modal (complex)',
-      checkCallback: (checking: boolean) => {
-        // Conditions to check
-        const markdownView =
-          this.app.workspace.getActiveViewOfType(MarkdownView);
-        if (markdownView) {
-          // If checking is true, we're simply "checking" if the command can be run.
-          // If checking is false, then we want to actually perform the operation.
-          if (!checking) {
-            new SampleModal(this.app).open();
-          }
-
-          // This command will only show up in Command Palette when the check function returns true
-          return true;
-        }
-      },
-    });
 
     // This adds a settings tab so the user can configure various aspects of the plugin
-    this.addSettingTab(new OmniClipperSettingTab(this.app, this));
+    this.addSettingTab(new LinkShelfSettingTab(this.app, this));
 
     // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
     // Using this function will automatically remove the event listener when this plugin is disabled.
@@ -130,7 +92,7 @@ export default class OmniClipperPlugin extends Plugin {
     const api = getAPI(this.settings.accessToken);
     const response = await api.get('/api/clips');
 
-    console.log('[OmniClipper] Got response: ', response);
+    console.log('[LinkShelf] Got response: ', response);
     const clips: Array<Clip> | undefined = response.data;
 
     if (clips) {
@@ -175,26 +137,10 @@ export default class OmniClipperPlugin extends Plugin {
   }
 }
 
-class SampleModal extends Modal {
-  constructor(app: App) {
-    super(app);
-  }
+class LinkShelfSettingTab extends PluginSettingTab {
+  plugin: LinkShelfPlugin;
 
-  onOpen() {
-    const {contentEl} = this;
-    contentEl.setText('Woah!');
-  }
-
-  onClose() {
-    const {contentEl} = this;
-    contentEl.empty();
-  }
-}
-
-class OmniClipperSettingTab extends PluginSettingTab {
-  plugin: OmniClipperPlugin;
-
-  constructor(app: App, plugin: OmniClipperPlugin) {
+  constructor(app: App, plugin: LinkShelfPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -204,7 +150,7 @@ class OmniClipperSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    containerEl.createEl('h2', {text: 'Settings for OmniClipper'});
+    containerEl.createEl('h2', {text: 'Settings for LinkShelf'});
 
     new Setting(containerEl)
       .setName('Clips Folder Path')
