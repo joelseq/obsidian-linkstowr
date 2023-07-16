@@ -1,20 +1,20 @@
 import {App, normalizePath, Notice, TFile} from 'obsidian';
-import {Clip} from 'src/types';
-
-// This file is mostly from https://github.com/anpigon/obsidian-book-search-plugin/blob/master/src/utils/template.ts
+import {Link} from 'src/types';
 
 const DEFAULT_TEMPLATE = `---
-tag: #bookmark
+tags: bookmark
 title: "{{title}}"
-url: "{{url}}"
+url: {{url}}
 ---
 
 # {{title}}
 
-{{note}}
-
 url: {{url}}
+
+{{note}}
 `;
+
+// This file is mostly from https://github.com/anpigon/obsidian-book-search-plugin/blob/master/src/utils/template.ts
 
 export async function getTemplateContents(
   app: App,
@@ -66,12 +66,12 @@ export function applyTemplateTransformations(
   );
 }
 
-export function replaceVariableSyntax(clip: Clip, text: string): string {
+export function replaceVariableSyntax(link: Link, text: string): string {
   if (!text?.trim()) {
     return '';
   }
 
-  const entries = Object.entries(clip);
+  const entries = Object.entries(link);
 
   return entries
     .reduce((result, [key, val = '']) => {
@@ -81,7 +81,7 @@ export function replaceVariableSyntax(clip: Clip, text: string): string {
     .trim();
 }
 
-export function executeInlineScriptsTemplates(clip: Clip, text: string) {
+export function executeInlineScriptsTemplates(link: Link, text: string) {
   const commandRegex = /<%(?:=)(.+)%>/g;
   const ctor = getFunctionConstructor();
   const matchedList = [...text.matchAll(commandRegex)];
@@ -89,12 +89,12 @@ export function executeInlineScriptsTemplates(clip: Clip, text: string) {
     try {
       const outputs = new ctor(
         [
-          'const [clip] = arguments',
+          'const [link] = arguments',
           `const output = ${script}`,
           'if(typeof output === "string") return output',
           'return JSON.stringify(output)',
         ].join(';'),
-      )(clip);
+      )(link);
       return result.replace(matched, outputs);
     } catch (err) {
       console.warn(err);

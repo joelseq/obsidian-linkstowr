@@ -1,5 +1,5 @@
 import {App, normalizePath, Plugin, PluginSettingTab, Setting} from 'obsidian';
-import {Clip} from './types';
+import {Link} from './types';
 import {getAPI} from './utils/api';
 import {replaceIllegalFileNameCharactersInString} from './utils/file';
 import {
@@ -14,22 +14,15 @@ import {
 
 interface PluginSettings {
   accessToken: string;
-  clipsFolderPath: string;
+  linksFolderPath: string;
   templateFilePath: string;
 }
 
 const DEFAULT_SETTINGS: PluginSettings = {
   accessToken: '',
-  clipsFolderPath: 'clips',
+  linksFolderPath: 'links',
   templateFilePath: '',
 };
-
-// const INITIAL_TEXT = `
-// # LinkShelf Clips
-//
-// | Link | Notes |
-// | ---- | ----- |
-// `;
 
 export default class LinkShelfPlugin extends Plugin {
   settings: PluginSettings;
@@ -57,7 +50,7 @@ export default class LinkShelfPlugin extends Plugin {
     // This adds a simple command that can be triggered anywhere
     this.addCommand({
       id: 'linkshelf-sync-links',
-      name: 'Sync links (Link Shelf)',
+      name: 'Sync links',
       callback: async () => {
         await this.sync();
       },
@@ -90,20 +83,18 @@ export default class LinkShelfPlugin extends Plugin {
 
   async sync() {
     const api = getAPI(this.settings.accessToken);
-    const response = await api.get('/api/clips');
+    const response = await api.get('/api/links');
 
     console.log('[LinkShelf] Got response: ', response);
-    const clips: Array<Clip> | undefined = response.data;
+    const links: Array<Link> | undefined = response.data;
 
-    if (clips) {
-      console.log('Got clips', clips);
-      const createdClipsPromises = clips.map(async (clip) => {
-        const renderedContent = await this.getRenderedContent(clip);
+    if (links) {
+      console.log('Got links', links);
+      const createdLinksPromises = links.map(async (link) => {
+        const renderedContent = await this.getRenderedContent(link);
 
-        const fileName = replaceIllegalFileNameCharactersInString(clip.title);
-        const filePath = `${normalizePath(
-          this.settings.clipsFolderPath,
-        )}/${fileName}.md`;
+        const fileName = replaceIllegalFileNameCharactersInString(link.title);
+        const filePath = this.getUniqueFilePath(fileName);
         try {
           const targetFile = await this.app.vault.create(
             filePath,
@@ -118,22 +109,37 @@ export default class LinkShelfPlugin extends Plugin {
         }
       });
 
-      await Promise.all(createdClipsPromises);
+      await Promise.all(createdLinksPromises);
 
-      await api.post('/api/clips/clear');
+      await api.post('/api/links/clear');
     }
   }
 
-  async getRenderedContent(clip: Clip) {
+  async getRenderedContent(link: Link) {
     const templateContents = await getTemplateContents(
       this.app,
       this.settings.templateFilePath,
     );
     const replacedVariable = replaceVariableSyntax(
-      clip,
+      link,
       applyTemplateTransformations(templateContents),
     );
-    return executeInlineScriptsTemplates(clip, replacedVariable);
+    return executeInlineScriptsTemplates(link, replacedVariable);
+  }
+
+  getUniqueFilePath(fileName: string): string {
+    let dupeCount = 0;
+    const folderPath = normalizePath(this.settings.linksFolderPath);
+    let path = `${folderPath}/${fileName}.md`;
+
+    // Handle duplicate file names by appending a count.
+    while (this.app.vault.getAbstractFileByPath(path) != null) {
+      dupeCount++;
+
+      path = `${folderPath}/${fileName}-${dupeCount}.md`;
+    }
+
+    return path;
   }
 }
 
@@ -153,17 +159,17 @@ class LinkShelfSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', {text: 'Settings for LinkShelf'});
 
     new Setting(containerEl)
-      .setName('Clips Folder Path')
-      .setDesc('Path to the folder to save the clips to')
+      .setName('Links Folder Path')
+      .setDesc(
+        'Path to the folder to save the links to (relative to your vault). Make sure the folder exists',
+      )
       .addText((text) =>
         text
-          .setPlaceholder(
-            'Enter the path to the folder to save your clips to (relative to your vault)',
-          )
-          .setValue(this.plugin.settings.clipsFolderPath)
+          .setPlaceholder('links')
+          .setValue(this.plugin.settings.linksFolderPath)
           .onChange(async (value) => {
-            console.log('Clips Folder Path: ' + value);
-            this.plugin.settings.clipsFolderPath = value;
+            console.log('Links Folder Path: ' + value);
+            this.plugin.settings.linksFolderPath = value;
             await this.plugin.saveSettings();
           }),
       );
@@ -173,7 +179,7 @@ class LinkShelfSettingTab extends PluginSettingTab {
       .setDesc('Enter your Access Token')
       .addText((text) =>
         text
-          .setPlaceholder('oclip_XXXXXX_XXXXXXXXXXX')
+          .setPlaceholder('lshelf_XXXXXX_XXXXXXXXXXX')
           .setValue(this.plugin.settings.accessToken)
           .onChange(async (value) => {
             this.plugin.settings.accessToken = value;
