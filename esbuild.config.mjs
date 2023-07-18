@@ -12,7 +12,9 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = process.argv[2] === 'production';
 
-const API_URL = prod ? '"http://localhost:8000"' : '"http://localhost:8000"';
+const API_URL = prod
+  ? '"https://linkshelf.shuttleapp.rs"'
+  : '"http://localhost:8000"';
 
 const context = await esbuild.context({
   banner: {
