@@ -23,9 +23,9 @@ NOTE: This is a very new tool and there may be some bugs and missing functionali
 1. Install this plugin.
 2. Go to the Settings > Community Plugins > Installed and ensure "LinkShelf" is enabled.
 3. Navigate to the settings for the plugin and configure the plugin:
-    3a. Input the Access Token that you previously generated. In case you forgot or lost the one you previously generated, you can create a new one and use that.
-    3b. Add the folder path to save links to. IMPORTANT: Make sure this folder exists.
-    3c. (Optional) Add the path to a template file to use. See instructions below for creating a template file.
+    - Input the Access Token that you previously generated. In case you forgot or lost the one you previously generated, you can create a new one and use that.
+    - Add the folder path to save links to. IMPORTANT: Make sure this folder exists.
+    - (Optional) Add the path to a template file to use. See instructions below for creating a template file.
 4. Once you have everything configured, run the "Sync" command to sync your saved links using either Command palette (cmd/ctrl+P) or using the ribbon icon "LinkShelf sync" on the sidebar.
 
 Once your links have successfully synced to your Obsidian vault, LinkShelf will no longer store your links. This ensures that your vault is the only long term home for your links!
