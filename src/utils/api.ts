@@ -1,9 +1,33 @@
-import axios from 'axios';
+import type {RequestUrlParam, RequestUrlResponse} from 'obsidian';
+import {requestUrl} from 'obsidian';
 
-export function getAPI(accessToken: string) {
-  return axios.create({
-    baseURL: process.env.API_URL,
-    timeout: 10000,
-    headers: {'X-Api-Token': accessToken},
-  });
+type RequestParams = Omit<RequestUrlParam, 'method' | 'headers'>;
+
+type API = {
+  get: (
+    url: string,
+    requestParams?: RequestParams,
+  ) => Promise<RequestUrlResponse>;
+  post: (
+    url: string,
+    requestParams?: RequestParams,
+  ) => Promise<RequestUrlResponse>;
+};
+
+export function getAPI(accessToken: string): API {
+  function requestFactory(method: 'get' | 'post') {
+    return async (url: string, requestParams?: RequestParams) => {
+      return await requestUrl({
+        url: `${process.env.API_URL}${url}`,
+        method,
+        headers: {'X-Api-Token': accessToken},
+        ...requestParams,
+      });
+    };
+  }
+
+  return {
+    get: requestFactory('get'),
+    post: requestFactory('post'),
+  };
 }

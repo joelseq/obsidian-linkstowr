@@ -1,4 +1,4 @@
-import {App, normalizePath, Notice, TFile} from 'obsidian';
+import {App, moment, normalizePath, Notice, TFile} from 'obsidian';
 import {Link} from 'src/types';
 
 const DEFAULT_TEMPLATE = `---
@@ -45,15 +45,13 @@ export function applyTemplateTransformations(
   return rawTemplateContents.replace(
     /{{\s*(date|time)\s*(([+-]\d+)([yqmwdhs]))?\s*(:.+?)?}}/gi,
     (_, _timeOrDate, calc, timeDelta, unit, momentFormat) => {
-      const now = window.moment();
-      const currentDate = window
-        .moment()
-        .clone()
-        .set({
-          hour: now.get('hour'),
-          minute: now.get('minute'),
-          second: now.get('second'),
-        });
+      // @ts-ignore
+      const now: moment.Moment = moment();
+      const currentDate = now.clone().set({
+        hour: now.hour(),
+        minute: now.minute(),
+        second: now.second(),
+      });
       if (calc) {
         currentDate.add(parseInt(timeDelta, 10), unit);
       }

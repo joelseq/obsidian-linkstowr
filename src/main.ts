@@ -10,8 +10,6 @@ import {
   useTemplaterPluginInFile,
 } from './utils/template';
 
-// Remember to rename these classes and interfaces!
-
 interface PluginSettings {
   accessToken: string;
   linksFolderPath: string;
@@ -31,25 +29,15 @@ export default class LinkShelfPlugin extends Plugin {
     await this.loadSettings();
 
     // This creates an icon in the left ribbon.
-    const ribbonIconEl = this.addRibbonIcon(
-      'dice',
-      'LinkShelf Sync',
-      (_evt: MouseEvent) => {
-        // Called when the user clicks the icon.
-        // new Notice('This is a notice!');
-        this.sync();
-      },
-    );
-    // Perform additional things with the ribbon
-    ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-    // This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-    const statusBarItemEl = this.addStatusBarItem();
-    statusBarItemEl.setText('Status Bar Text');
+    this.addRibbonIcon('dice', 'LinkShelf Sync', (_evt: MouseEvent) => {
+      // Called when the user clicks the icon.
+      // new Notice('This is a notice!');
+      this.sync();
+    });
 
     // This adds a simple command that can be triggered anywhere
     this.addCommand({
-      id: 'linkshelf-sync-links',
+      id: 'sync-links',
       name: 'Sync links',
       callback: async () => {
         await this.sync();
@@ -86,10 +74,9 @@ export default class LinkShelfPlugin extends Plugin {
     const response = await api.get('/api/links');
 
     console.log('[LinkShelf] Got response: ', response);
-    const links: Array<Link> | undefined = response.data;
+    const links: Array<Link> | undefined = response.json;
 
     if (links) {
-      console.log('Got links', links);
       const createdLinksPromises = links.map(async (link) => {
         const renderedContent = await this.getRenderedContent(link);
 
@@ -100,8 +87,6 @@ export default class LinkShelfPlugin extends Plugin {
             filePath,
             renderedContent,
           );
-
-          console.log('Target file:', targetFile);
 
           await useTemplaterPluginInFile(this.app, targetFile);
         } catch (err) {
@@ -154,12 +139,8 @@ class LinkShelfSettingTab extends PluginSettingTab {
   display(): void {
     const {containerEl} = this;
 
-    containerEl.empty();
-
-    containerEl.createEl('h2', {text: 'Settings for LinkShelf'});
-
     new Setting(containerEl)
-      .setName('Links Folder Path')
+      .setName('Links folder path')
       .setDesc(
         'Path to the folder to save the links to (relative to your vault). Make sure the folder exists',
       )
@@ -168,7 +149,6 @@ class LinkShelfSettingTab extends PluginSettingTab {
           .setPlaceholder('links')
           .setValue(this.plugin.settings.linksFolderPath)
           .onChange(async (value) => {
-            console.log('Links Folder Path: ' + value);
             this.plugin.settings.linksFolderPath = value;
             await this.plugin.saveSettings();
           }),
@@ -188,7 +168,7 @@ class LinkShelfSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Template File Path')
+      .setName('Template file path')
       .setDesc('Enter path to template file')
       .addText((text) =>
         text
