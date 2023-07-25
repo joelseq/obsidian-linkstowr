@@ -1,6 +1,6 @@
 {
   "name": "obsidian-linkshelf",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Easily sync links from your browser into Obsidian.",
   "main": "main.js",
   "scripts": {
