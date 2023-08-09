@@ -21,12 +21,14 @@ interface PluginSettings {
   accessToken: string;
   linksFolderPath: string;
   templateFilePath: string;
+  syncOnLoad: boolean;
 }
 
 const DEFAULT_SETTINGS: PluginSettings = {
   accessToken: '',
   linksFolderPath: 'links',
   templateFilePath: '',
+  syncOnLoad: false,
 };
 
 export default class LinkShelfPlugin extends Plugin {
@@ -53,6 +55,10 @@ export default class LinkShelfPlugin extends Plugin {
 
     // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new LinkShelfSettingTab(this.app, this));
+
+    if (this.settings.syncOnLoad) {
+      await this.sync();
+    }
 
     // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
     // Using this function will automatically remove the event listener when this plugin is disabled.
@@ -189,6 +195,18 @@ class LinkShelfSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.templateFilePath)
           .onChange(async (value) => {
             this.plugin.settings.templateFilePath = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('Sync on load')
+      .setDesc('Run the Sync command when Obsidian loads')
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.syncOnLoad)
+          .onChange(async (value) => {
+            this.plugin.settings.syncOnLoad = value;
             await this.plugin.saveSettings();
           }),
       );
