@@ -1,4 +1,11 @@
-import {App, normalizePath, Plugin, PluginSettingTab, Setting} from 'obsidian';
+import {
+  App,
+  normalizePath,
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+} from 'obsidian';
 import {Link} from './types';
 import {getAPI} from './utils/api';
 import {replaceIllegalFileNameCharactersInString} from './utils/file';
@@ -71,32 +78,39 @@ export default class LinkShelfPlugin extends Plugin {
 
   async sync() {
     const api = getAPI(this.settings.accessToken);
-    const response = await api.get('/api/links');
+    try {
+      const response = await api.get('/api/links');
 
-    console.log('[LinkShelf] Got response: ', response);
-    const links: Array<Link> | undefined = response.json;
+      console.log('[LinkShelf] Got response: ', response);
+      const links: Array<Link> | undefined = response.json;
 
-    if (links) {
-      const createdLinksPromises = links.map(async (link) => {
-        const renderedContent = await this.getRenderedContent(link);
+      if (links) {
+        const createdLinksPromises = links.map(async (link) => {
+          const renderedContent = await this.getRenderedContent(link);
 
-        const fileName = replaceIllegalFileNameCharactersInString(link.title);
-        const filePath = this.getUniqueFilePath(fileName);
-        try {
-          const targetFile = await this.app.vault.create(
-            filePath,
-            renderedContent,
-          );
+          const fileName = replaceIllegalFileNameCharactersInString(link.title);
+          const filePath = this.getUniqueFilePath(fileName);
+          try {
+            const targetFile = await this.app.vault.create(
+              filePath,
+              renderedContent,
+            );
 
-          await useTemplaterPluginInFile(this.app, targetFile);
-        } catch (err) {
-          console.error(`Failed to create file: ${fileName}`, err);
-        }
-      });
+            await useTemplaterPluginInFile(this.app, targetFile);
+          } catch (err) {
+            console.error(`Failed to create file: ${fileName}`, err);
+            throw new Error('Failed when creating file');
+          }
+        });
 
-      await Promise.all(createdLinksPromises);
+        await Promise.all(createdLinksPromises);
 
-      await api.post('/api/links/clear');
+        await api.post('/api/links/clear');
+
+        new Notice('LinkShelf Sync successful!', 3000);
+      }
+    } catch (error) {
+      new Notice('LinkShelf Sync failed', 3000);
     }
   }
 
