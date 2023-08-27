@@ -159,6 +159,8 @@ class LinkShelfSettingTab extends PluginSettingTab {
   display(): void {
     const {containerEl} = this;
 
+    containerEl.empty();
+
     new Setting(containerEl)
       .setName('Links folder path')
       .setDesc(
