@@ -1,3 +1,3 @@
 export function replaceIllegalFileNameCharactersInString(text: string) {
-  return text.replace(/[\\,#%&{}/*<>$":@.?]/g, '').replace(/\s+/g, ' ');
+  return text.replace(/[\\,#%&{}/|*<>$":@.?]/g, '').replace(/\s+/g, ' ');
 }
