@@ -63,6 +63,12 @@ TABLE url, note
 FROM #bookmark and #later
 ```
 
+### Related repos
+
+- [LinkStowr API](https://github.com/joelseq/linkstowr-api)
+- [LinkStowr Web App](https://github.com/joelseq/linkstowr-web)
+- [LinkStowr Chrome Extension](https://github.com/joelseq/linkstowr-extension)
+
 ### Thanks
 
 The following resources were very helpful resources to look at for learning how to create this plugin:
