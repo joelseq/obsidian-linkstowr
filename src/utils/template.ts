@@ -34,7 +34,7 @@ export async function getTemplateContents(
     return templateFile ? vault.cachedRead(templateFile) : DEFAULT_TEMPLATE;
   } catch (err) {
     console.error(`Failed to read template path: ${templatePath}`, err);
-    new Notice('Failed to read template file LinkShelf');
+    new Notice('Failed to read template file LinkStowr');
     return DEFAULT_TEMPLATE;
   }
 }

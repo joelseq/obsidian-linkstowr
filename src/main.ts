@@ -31,14 +31,14 @@ const DEFAULT_SETTINGS: PluginSettings = {
   syncOnLoad: false,
 };
 
-export default class LinkShelfPlugin extends Plugin {
+export default class LinkStowrPlugin extends Plugin {
   settings: PluginSettings;
 
   async onload() {
     await this.loadSettings();
 
     // This creates an icon in the left ribbon.
-    this.addRibbonIcon('dice', 'LinkShelf Sync', (_evt: MouseEvent) => {
+    this.addRibbonIcon('dice', 'LinkStowr Sync', (_evt: MouseEvent) => {
       // Called when the user clicks the icon.
       // new Notice('This is a notice!');
       this.sync();
@@ -54,7 +54,7 @@ export default class LinkShelfPlugin extends Plugin {
     });
 
     // This adds a settings tab so the user can configure various aspects of the plugin
-    this.addSettingTab(new LinkShelfSettingTab(this.app, this));
+    this.addSettingTab(new LinkStowrSettingTab(this.app, this));
 
     if (this.settings.syncOnLoad) {
       await this.sync();
@@ -87,7 +87,7 @@ export default class LinkShelfPlugin extends Plugin {
     try {
       const response = await api.get('/api/links');
 
-      console.log('[LinkShelf] Got response: ', response);
+      console.log('[LinkStowr] Got response: ', response);
       const links: Array<Link> | undefined = response.json;
 
       if (links) {
@@ -113,10 +113,10 @@ export default class LinkShelfPlugin extends Plugin {
 
         await api.post('/api/links/clear');
 
-        new Notice('LinkShelf Sync successful!', 3000);
+        new Notice('LinkStowr Sync successful!', 3000);
       }
     } catch (error) {
-      new Notice('LinkShelf Sync failed', 3000);
+      new Notice('LinkStowr Sync failed', 3000);
     }
   }
 
@@ -148,10 +148,10 @@ export default class LinkShelfPlugin extends Plugin {
   }
 }
 
-class LinkShelfSettingTab extends PluginSettingTab {
-  plugin: LinkShelfPlugin;
+class LinkStowrSettingTab extends PluginSettingTab {
+  plugin: LinkStowrPlugin;
 
-  constructor(app: App, plugin: LinkShelfPlugin) {
+  constructor(app: App, plugin: LinkStowrPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
