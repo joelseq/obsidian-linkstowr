@@ -16,7 +16,7 @@ NOTE: This is a very new tool and there may be some bugs and missing functionali
 
 ## Prerequisites
 1. Create an account at https://linkstowr.com/ and generate an Access Token.
-2. Download the [Chrome Extension](https://chrome.google.com/webstore/detail/ahppmgflbaeiphlkkgngijgmfapabgee) and input your Access Token.
+2. Download the [Chrome Extension](https://chrome.google.com/webstore/detail/linkstowr/aabkobajeambdejghgegicnhcndhcjpk) and input your Access Token.
 3. Start saving links using the Chrome Extension.
 
 ## Using the plugin
