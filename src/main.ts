@@ -22,6 +22,7 @@ interface PluginSettings {
   linksFolderPath: string;
   templateFilePath: string;
   syncOnLoad: boolean;
+  customServerURL: string;
 }
 
 const DEFAULT_SETTINGS: PluginSettings = {
@@ -29,6 +30,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
   linksFolderPath: 'links',
   templateFilePath: '',
   syncOnLoad: false,
+  customServerURL: '',
 };
 
 export default class LinkStowrPlugin extends Plugin {
@@ -83,7 +85,10 @@ export default class LinkStowrPlugin extends Plugin {
   }
 
   async sync() {
-    const api = getAPI(this.settings.accessToken);
+    const api = getAPI(
+      this.settings.accessToken,
+      this.settings.customServerURL,
+    );
     try {
       const response = await api.get('/api/links');
 
@@ -209,6 +214,21 @@ class LinkStowrSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.syncOnLoad)
           .onChange(async (value) => {
             this.plugin.settings.syncOnLoad = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('Custom server URL')
+      .setDesc(
+        'Add this if you are self-hosting LinkStowr and would like to use a custom server. Make sure the URL does not end in a `/` e.g. https://www.myserver.com',
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder('https://www.myserver.com')
+          .setValue(this.plugin.settings.customServerURL)
+          .onChange(async (value) => {
+            this.plugin.settings.customServerURL = value;
             await this.plugin.saveSettings();
           }),
       );
