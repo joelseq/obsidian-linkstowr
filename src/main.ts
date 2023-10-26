@@ -8,7 +8,7 @@ import {
 } from 'obsidian';
 import {Link} from './types';
 import {getAPI} from './utils/api';
-import {replaceIllegalFileNameCharactersInString} from './utils/file';
+import {replaceIllegalFileNameCharactersInString, truncate} from './utils/file';
 import {
   applyTemplateTransformations,
   executeInlineScriptsTemplates,
@@ -99,7 +99,12 @@ export default class LinkStowrPlugin extends Plugin {
         const createdLinksPromises = links.map(async (link) => {
           const renderedContent = await this.getRenderedContent(link);
 
-          const fileName = replaceIllegalFileNameCharactersInString(link.title);
+          // We remove illegal file name characters and then truncate it to 200
+          // characters to avoid file name limits.
+          const fileName = truncate(
+            replaceIllegalFileNameCharactersInString(link.title),
+            200,
+          );
           const filePath = this.getUniqueFilePath(fileName);
           try {
             const targetFile = await this.app.vault.create(
