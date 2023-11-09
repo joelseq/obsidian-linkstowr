@@ -1,5 +1,8 @@
 # Obsidian LinkStowr
 
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/joelseq/obsidian-linkstowr?sort=semver&color=blue)
+![Downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2FHEAD%2Fcommunity-plugin-stats.json&query=%24.linkshelf.downloads&logo=obsidian&logoColor=%23a88cf7&label=downloads&color=important)
+
 This repository is the Obsidian plugin for LinkStowr. LinkStowr is a free, open source and privacy-friendly set of tools (Chrome Extension + Obsidian plugin) designed to make it extremely easy to capture and store your valuable online resources in a structured and meaningful way.
 
 Save important bookmarks along with a simple note using the Chrome Extension:
