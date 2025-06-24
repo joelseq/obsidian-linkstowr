@@ -18,17 +18,19 @@ NOTE: This is a very new tool and there may be some bugs and missing functionali
 ## Usage
 
 ## Prerequisites
+
 1. Create an account at https://linkstowr.com/ and generate an Access Token.
 2. Download the [Chrome Extension](https://chrome.google.com/webstore/detail/linkstowr/aabkobajeambdejghgegicnhcndhcjpk) and input your Access Token.
 3. Start saving links using the Chrome Extension.
 
 ## Using the plugin
+
 1. Install this plugin.
 2. Go to the Settings > Community Plugins > Installed and ensure "LinkStowr" is enabled.
 3. Navigate to the settings for the plugin and configure the plugin:
-    - Input the Access Token that you previously generated. In case you forgot or lost the one you previously generated, you can create a new one and use that.
-    - Add the folder path to save links to. IMPORTANT: Make sure this folder exists.
-    - (Optional) Add the path to a template file to use. See instructions below for creating a template file.
+   - Input the Access Token that you previously generated. In case you forgot or lost the one you previously generated, you can create a new one and use that.
+   - Add the folder path to save links to. IMPORTANT: Make sure this folder exists.
+   - (Optional) Add the path to a template file to use. See instructions below for creating a template file.
 4. Once you have everything configured, run the "Sync" command to sync your saved links using either Command palette (cmd/ctrl+P) or using the ribbon icon "LinkStowr sync" on the sidebar.
 
 Once your links have successfully synced to your Obsidian vault, LinkStowr will no longer store your links. This ensures that your vault is the only long term home for your links!
@@ -36,14 +38,17 @@ Once your links have successfully synced to your Obsidian vault, LinkStowr will 
 ### Templates
 
 LinkStowr allows you to customize the final output of your link file using a template file provided in the plugin's settings. The following variables are available to be used in your template file:
+
 - title: The title that your link was saved with in the Chrome Extension. This usually defaults to the title of the tab the link was saved from.
 - url: The url of the link.
+- tags: A comma separated list of tags added while saving the link.
 - note: The note that you added for your link using the Chrome Extension.
 
 Here's the default template that files get saved with. Feel free to tweak it to your requirements:
+
 ```
 ---
-tags: bookmark
+tags: bookmark, {{tags}}
 title: "{{title}}"
 url: {{url}}
 ---
@@ -75,7 +80,7 @@ FROM #bookmark and #later
 ### Thanks
 
 The following resources were very helpful resources to look at for learning how to create this plugin:
+
 - [Obsidian Developer Documentation](https://docs.obsidian.md/)
 - [Obsidian Kindle Plugin repo](https://github.com/hadynz/obsidian-kindle-plugin)
 - [Obsidian Book Search Plugin](https://github.com/anpigon/obsidian-book-search-plugin)
-

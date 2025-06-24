@@ -1,8 +1,8 @@
-import {App, moment, normalizePath, Notice, TFile} from 'obsidian';
-import {Link} from 'src/types';
+import { App, moment, normalizePath, Notice, TFile } from 'obsidian';
+import { Link } from 'src/types';
 
 const DEFAULT_TEMPLATE = `---
-tags: bookmark
+tags: bookmark, {{tags}}
 title: "{{title}}"
 url: {{url}}
 ---
@@ -23,7 +23,7 @@ export async function getTemplateContents(
   if (templatePath == null || templatePath === '') {
     return DEFAULT_TEMPLATE;
   }
-  const {metadataCache, vault} = app;
+  const { metadataCache, vault } = app;
   const normalizedTemplatePath = normalizePath(templatePath);
 
   try {
