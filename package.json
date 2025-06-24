@@ -1,6 +1,6 @@
 {
   "name": "obsidian-linkstowr",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Easily sync links from your browser into Obsidian.",
   "main": "main.js",
   "scripts": {
