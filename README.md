@@ -73,7 +73,7 @@ FROM #bookmark and #later
 
 ### Related repos
 
-- [LinkStowr API](https://github.com/joelseq/linkstowr-api)
+- [LinkStowr API v2](https://github.com/joelseq/linkstowr-api-v2)
 - [LinkStowr Web App](https://github.com/joelseq/linkstowr-web)
 - [LinkStowr Chrome Extension](https://github.com/joelseq/linkstowr-extension)
 
