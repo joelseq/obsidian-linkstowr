@@ -61,7 +61,8 @@ export default class LinkStowrPlugin extends Plugin {
     this.addSettingTab(new LinkStowrSettingTab(this.app, this));
 
     if (this.settings.syncOnLoad) {
-      await this.sync();
+      // don't await this as it will delay initialization
+      void this.sync();
     }
 
     // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
