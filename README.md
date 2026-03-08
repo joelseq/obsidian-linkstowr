@@ -39,10 +39,15 @@ Once your links have successfully synced to your Obsidian vault, LinkStowr will 
 
 LinkStowr allows you to customize the final output of your link file using a template file provided in the plugin's settings. The following variables are available to be used in your template file:
 
-- title: The title that your link was saved with in the Chrome Extension. This usually defaults to the title of the tab the link was saved from.
-- url: The url of the link.
-- tags: A comma separated list of tags added while saving the link.
-- note: The note that you added for your link using the Chrome Extension.
+| Variable | Description |
+|---|---|
+| `{{title}}` | The title the link was saved with. Usually defaults to the page title. |
+| `{{url}}` | The URL of the link. |
+| `{{tags}}` | Comma-separated tags added while saving the link. When used in a frontmatter `tags:` field, automatically formatted as a YAML list. |
+| `{{tagsYaml}}` | Tags pre-formatted as YAML list items (`  - tag`). Use this for explicit control when placing tags in a custom YAML structure. |
+| `{{note}}` | The note added for the link using the Chrome Extension. |
+| `{{description}}` | The description of the page (from meta tags). |
+| `{{image_url}}` | The preview image URL of the page (from Open Graph meta tags). |
 
 Here's the default template that files get saved with. Feel free to tweak it to your requirements:
 
