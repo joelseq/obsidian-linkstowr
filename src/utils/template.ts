@@ -64,19 +64,49 @@ export function applyTemplateTransformations(
   );
 }
 
+function normalizeFrontmatterTags(text: string): string {
+  const match = text.match(/^(---\n)([\s\S]*?)(\n---)/);
+  if (!match) return text;
+
+  const [fullMatch, open, frontmatter, close] = match;
+
+  // Only transform inline "tags: val1, val2" — skip if already a YAML list (no inline value)
+  const normalized = frontmatter.replace(
+    /^(tags):\s*([^\n].+)$/m,
+    (_, key, value) => {
+      const tags = value
+        .split(',')
+        .map((t: string) => t.trim())
+        .filter(Boolean);
+      return `${key}:\n${tags.map((t: string) => `  - ${t}`).join('\n')}`;
+    },
+  );
+
+  return text.replace(fullMatch, open + normalized + close);
+}
+
 export function replaceVariableSyntax(link: Link, text: string): string {
   if (!text?.trim()) {
     return '';
   }
 
   const entries = Object.entries(link);
+  const tagsYaml = link.tags
+    ? link.tags
+        .split(',')
+        .map((t) => `  - ${t.trim()}`)
+        .join('\n')
+    : '';
 
-  return entries
+  const substituted = entries
     .reduce((result, [key, val = '']) => {
       return result.replace(new RegExp(`{{${key}}}`, 'ig'), val);
     }, text)
+    .replace(/{{tagsYaml}}/gi, tagsYaml)
     .replace(/{{\w+}}/gi, '')
     .trim();
+
+  return normalizeFrontmatterTags(substituted);
 }
 
 export function executeInlineScriptsTemplates(link: Link, text: string) {
