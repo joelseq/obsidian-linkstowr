@@ -6,7 +6,7 @@ import {
   PluginSettingTab,
   Setting,
 } from 'obsidian';
-import {Link} from './types';
+import type {Link} from './types';
 import {getAPI} from './utils/api';
 import {replaceIllegalFileNameCharactersInString, truncate} from './utils/file';
 import {
