@@ -46,6 +46,7 @@ LinkStowr allows you to customize the final output of your link file using a tem
 | `{{note}}`        | The note added for the link using the Chrome Extension.                                                                             |
 | `{{description}}` | The description of the page (from meta tags).                                                                                       |
 | `{{image_url}}`   | The preview image URL of the page (from Open Graph meta tags).                                                                      |
+| `{{bookmarked_at}}` | The date the link was bookmarked. Supports format specifiers e.g. `{{bookmarked_at:YYYY-MM-DD}}`.                                 |
 
 Here's the default template that files get saved with. Feel free to tweak it to your requirements:
 
@@ -56,6 +57,7 @@ title: "{{title}}"
 url: "{{url}}"
 description: "{{description}}"
 image: "{{image_url}}"
+bookmarked_at: "{{bookmarked_at:YYYY-MM-DD}}"
 ---
 
 {{note}}

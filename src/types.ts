@@ -5,4 +5,5 @@ export type Link = {
   tags: string;
   description: string | undefined;
   image_url: string | undefined;
+  bookmarked_at: string;
 };

@@ -7,6 +7,7 @@ title: "{{title}}"
 url: "{{url}}"
 description: "{{description}}"
 image: "{{image_url}}"
+bookmarked_at: "{{bookmarked_at:YYYY-MM-DD}}"
 ---
 
 {{note}}
@@ -101,6 +102,13 @@ export function replaceVariableSyntax(link: Link, text: string): string {
       return result.replace(new RegExp(`{{${key}}}`, 'ig'), val);
     }, text)
     .replace(/{{tagsYaml}}/gi, tagsYaml)
+    .replace(
+      /{{bookmarked_at:\s*(.+?)}}/gi,
+      (_, fmt) =>
+        (moment as unknown as (s: string) => moment.Moment)(
+          link.bookmarked_at,
+        ).format(fmt.trim()),
+    )
     .replace(/{{\w+}}/gi, '')
     .trim();
 
