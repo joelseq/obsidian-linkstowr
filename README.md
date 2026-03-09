@@ -55,21 +55,25 @@ Here's the default template that files get saved with. Feel free to tweak it to 
 ---
 tags: bookmark, {{tags}}
 title: "{{title}}"
-url: {{url}}
+url: "{{url}}"
+description: "{{description}}"
+image: "{{image_url}}"
 ---
-
-# {{title}}
-
-url: {{url}}
 
 {{note}}
 ```
 
 ### Tips
 
-The main use case that I created LinkStowr for is to have a way for me to easily store useful links that integrates well with my existing workflow (which relies heavily on Obsidian) and makes it very easy to query for and organize later. I use it as a bookmarking tool by adding some relevant information in the note like the person that shared that link with me or certain tags like #health, #tech, #learning. I also use it as a read/watch it later tool by adding a #later on the note. With these hashtags and my link template, I can then use this to create [Dataview](https://github.com/blacksmithgu/obsidian-dataview) queries. Example:
+The main use case that I created LinkStowr for is to have a way for me to easily store useful links that integrates well with my existing workflow (which relies heavily on Obsidian) and makes it very easy to query for and organize later. I use it as a bookmarking tool by adding some relevant information in the note like the person that shared that link with me or certain tags like #health, #tech, #learning. I also use it as a read/watch it later tool by adding a #later tag.
 
-Find a list of the links marked as later (this assumes you have a "bookmark" tag added to your links which is in the default template).
+#### Obsidian Bases
+
+[Obsidian Bases](https://obsidian.md/bases) is a great way to organize and browse your saved links. You can filter by tags, sort by `bookmarked_at`, and use the **card layout** with the `image` property to get a visual bookmark gallery — similar to Pinterest or a read-it-later app.
+
+#### Dataview
+
+You can also use the [Dataview](https://github.com/blacksmithgu/obsidian-dataview) plugin to query your links. For example, find all links marked as "read later":
 
 ```dataview
 TABLE url, note
