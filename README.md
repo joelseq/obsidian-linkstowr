@@ -13,8 +13,6 @@ Periodically sync your links with your Obsidian vault.
 
 [linkshelf-obsidian.webm](https://github.com/joelseq/obsidian-linkshelf/assets/12389411/fae8324c-ec3d-4fbc-9b07-23a21333c1c1)
 
-NOTE: This is a very new tool and there may be some bugs and missing functionality.
-
 ## Usage
 
 ## Prerequisites
@@ -39,15 +37,15 @@ Once your links have successfully synced to your Obsidian vault, LinkStowr will 
 
 LinkStowr allows you to customize the final output of your link file using a template file provided in the plugin's settings. The following variables are available to be used in your template file:
 
-| Variable | Description |
-|---|---|
-| `{{title}}` | The title the link was saved with. Usually defaults to the page title. |
-| `{{url}}` | The URL of the link. |
-| `{{tags}}` | Comma-separated tags added while saving the link. When used in a frontmatter `tags:` field, automatically formatted as a YAML list. |
-| `{{tagsYaml}}` | Tags pre-formatted as YAML list items (`  - tag`). Use this for explicit control when placing tags in a custom YAML structure. |
-| `{{note}}` | The note added for the link using the Chrome Extension. |
-| `{{description}}` | The description of the page (from meta tags). |
-| `{{image_url}}` | The preview image URL of the page (from Open Graph meta tags). |
+| Variable          | Description                                                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `{{title}}`       | The title the link was saved with. Usually defaults to the page title.                                                              |
+| `{{url}}`         | The URL of the link.                                                                                                                |
+| `{{tags}}`        | Comma-separated tags added while saving the link. When used in a frontmatter `tags:` field, automatically formatted as a YAML list. |
+| `{{tagsYaml}}`    | Tags pre-formatted as YAML list items (`  - tag`). Use this for explicit control when placing tags in a custom YAML structure.      |
+| `{{note}}`        | The note added for the link using the Chrome Extension.                                                                             |
+| `{{description}}` | The description of the page (from meta tags).                                                                                       |
+| `{{image_url}}`   | The preview image URL of the page (from Open Graph meta tags).                                                                      |
 
 Here's the default template that files get saved with. Feel free to tweak it to your requirements:
 
@@ -70,6 +68,8 @@ The main use case that I created LinkStowr for is to have a way for me to easily
 #### Obsidian Bases
 
 [Obsidian Bases](https://obsidian.md/bases) is a great way to organize and browse your saved links. You can filter by tags, sort by `bookmarked_at`, and use the **card layout** with the `image` property to get a visual bookmark gallery — similar to Pinterest or a read-it-later app.
+
+![Obsidian Base example](assets/linkstowr-bookmarks-base.png)
 
 #### Dataview
 
